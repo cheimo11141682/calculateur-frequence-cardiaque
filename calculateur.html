@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Calculateur de fréquence cardiaque</title>
+
+<style>
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background: linear-gradient(135deg, #e8f4ff, #f8fbff);
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+    color: #17324d;
+}
+
+.calculateur {
+    width: 100%;
+    max-width: 650px;
+    background: white;
+    padding: 30px;
+    border-radius: 20px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+}
+
+h1 {
+    text-align: center;
+    margin-top: 0;
+    font-size: 30px;
+}
+
+.intro {
+    text-align: center;
+    color: #5d7185;
+    margin-bottom: 25px;
+}
+
+label {
+    display: block;
+    font-weight: bold;
+    margin-bottom: 8px;
+}
+
+input {
+    width: 100%;
+    padding: 14px;
+    font-size: 18px;
+    border: 2px solid #d5e2ec;
+    border-radius: 10px;
+}
+
+button {
+    width: 100%;
+    margin-top: 15px;
+    padding: 15px;
+    border: none;
+    border-radius: 10px;
+    background: #1769aa;
+    color: white;
+    font-size: 18px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+button:hover {
+    background: #125789;
+}
+
+#resultat {
+    display: none;
+    margin-top: 25px;
+}
+
+.fcm {
+    text-align: center;
+    background: #eaf5ff;
+    padding: 20px;
+    border-radius: 15px;
+    margin-bottom: 20px;
+}
+
+.fcm span {
+    display: block;
+    font-size: 36px;
+    font-weight: bold;
+    margin-top: 8px;
+}
+
+.zone {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px;
+    margin-bottom: 10px;
+    background: #f4f8fb;
+    border-radius: 10px;
+    border-left: 6px solid #1769aa;
+}
+
+.zone strong {
+    display: block;
+}
+
+.zone small {
+    color: #65798b;
+}
+
+.bpm {
+    font-weight: bold;
+    white-space: nowrap;
+}
+
+.erreur {
+    color: #b42318;
+    font-weight: bold;
+    margin-top: 10px;
+    display: none;
+}
+
+.note {
+    margin-top: 20px;
+    font-size: 13px;
+    color: #65798b;
+    line-height: 1.5;
+}
+</style>
+</head>
+
+<body>
+
+<div class="calculateur">
+
+    <h1>❤️ Calculateur de fréquence cardiaque</h1>
+
+    <p class="intro">
+        Entre ton âge pour calculer ta fréquence cardiaque maximale
+        et tes différentes zones d'intensité.
+    </p>
+
+    <label for="age">Ton âge :</label>
+
+    <input
+        type="number"
+        id="age"
+        min="1"
+        max="120"
+        placeholder="Exemple : 16"
+    >
+
+    <button onclick="calculer()">
+        Calculer ma fréquence cardiaque
+    </button>
+
+    <div id="erreur" class="erreur"></div>
+
+    <div id="resultat">
+
+        <div class="fcm">
+            Fréquence cardiaque maximale estimée
+
+            <span id="fcm">-- bpm</span>
+        </div>
+
+        <div class="zone">
+            <div>
+                <strong>Zone 1 — Très légère</strong>
+                <small>50 à 60 % de la FCM</small>
+            </div>
+            <div class="bpm" id="zone1"></div>
+        </div>
+
+        <div class="zone">
+            <div>
+                <strong>Zone 2 — Légère</strong>
+                <small>60 à 70 % de la FCM</small>
+            </div>
+            <div class="bpm" id="zone2"></div>
+        </div>
+
+        <div class="zone">
+            <div>
+                <strong>Zone 3 — Modérée</strong>
+                <small>70 à 80 % de la FCM</small>
+            </div>
+            <div class="bpm" id="zone3"></div>
+        </div>
+
+        <div class="zone">
+            <div>
+                <strong>Zone 4 — Intense</strong>
+                <small>80 à 90 % de la FCM</small>
+            </div>
+            <div class="bpm" id="zone4"></div>
+        </div>
+
+        <div class="zone">
+            <div>
+                <strong>Zone 5 — Très intense</strong>
+                <small>90 à 100 % de la FCM</small>
+            </div>
+            <div class="bpm" id="zone5"></div>
+        </div>
+
+        <p class="note">
+            Formule utilisée : FCM ≈ 220 − âge.
+            Il s'agit d'une estimation à visée pédagogique et non d'une mesure médicale.
+        </p>
+
+    </div>
+</div>
+
+<script>
+
+function calculer() {
+
+    const age = Number(document.getElementById("age").value);
+
+    const erreur = document.getElementById("erreur");
+    const resultat = document.getElementById("resultat");
+
+    if (!age || age < 1 || age > 120) {
+
+        erreur.textContent =
+            "Merci d'entrer un âge compris entre 1 et 120 ans.";
+
+        erreur.style.display = "block";
+        resultat.style.display = "none";
+
+        return;
+    }
+
+    erreur.style.display = "none";
+
+    // Calcul de la fréquence cardiaque maximale
+    const fcm = 220 - age;
+
+    document.getElementById("fcm").textContent =
+        fcm + " bpm";
+
+    // Calcul des différentes zones
+    document.getElementById("zone1").textContent =
+        Math.round(fcm * 0.50) + " – " +
+        Math.round(fcm * 0.60) + " bpm";
+
+    document.getElementById("zone2").textContent =
+        Math.round(fcm * 0.60) + " – " +
+        Math.round(fcm * 0.70) + " bpm";
+
+    document.getElementById("zone3").textContent =
+        Math.round(fcm * 0.70) + " – " +
+        Math.round(fcm * 0.80) + " bpm";
+
+    document.getElementById("zone4").textContent =
+        Math.round(fcm * 0.80) + " – " +
+        Math.round(fcm * 0.90) + " bpm";
+
+    document.getElementById("zone5").textContent =
+        Math.round(fcm * 0.90) + " – " +
+        Math.round(fcm * 1.00) + " bpm";
+
+    resultat.style.display = "block";
+}
+
+</script>
+
+</body>
+</html>
